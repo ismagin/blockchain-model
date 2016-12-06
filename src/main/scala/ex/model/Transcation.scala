@@ -3,7 +3,7 @@ package ex.model
 trait Transaction
 
 case class GenesisTransaction(recipient: Address,
-                              timestamp: Long,
+                              timestamp: Timestamp,
                               quantity: Long)
 
 case class IssueTransaction(sender: Account,
@@ -13,21 +13,21 @@ case class IssueTransaction(sender: Account,
                             decimals: Byte,
                             reissuable: Boolean,
                             feeMoney: WavesMoney,
-                            timestamp: Long)
+                            timestamp: Timestamp)
 
 case class ReissueTransaction(sender: Account,
                               issue: AssetMoney,
                               reissuable: Boolean,
                               feeMoney: WavesMoney,
-                              timestamp: Long)
+                              timestamp: Timestamp)
 
 case class PaymentTransaction(sender: Account,
                               recipient: Address,
-                              quantity: Long,
-                              fee: Long,
-                              timestamp: Long)
+                              quantity: WavesMoney,
+                              fee: WavesMoney,
+                              timestamp: Timestamp)
 
-case class TransferTransaction(timestamp: Long,
+case class TransferTransaction(timestamp: Timestamp,
                                sender: Account,
                                recipient: Address,
                                transfer: Money,
