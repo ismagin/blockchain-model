@@ -2,9 +2,6 @@ package ex
 
 import cats.data.{NonEmptyList, Validated}
 
-/**
-  * Created by ilya on 06.12.16.
-  */
 package object model {
 
   type Height     = Int

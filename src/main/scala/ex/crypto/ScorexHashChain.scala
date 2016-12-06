@@ -1,4 +1,4 @@
-package ex
+package ex.crypto
 
 object ScorexHashChain {
 

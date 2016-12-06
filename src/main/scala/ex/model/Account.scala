@@ -1,7 +1,7 @@
 package ex.model
 
 import cats.data.ValidatedFunctions
-import ex.ScorexHashChain
+import ex.crypto.ScorexHashChain
 
 case class Account(publicKey: PublicKey, privateKey: Option[PrivateKey] = None)
 
