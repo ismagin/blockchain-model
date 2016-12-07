@@ -2,18 +2,17 @@ package ex.model.validation
 
 import cats.data.{NonEmptyList, Validated, ValidatedFunctions}
 import cats.free.Free
-import ex.model.state.Storage
+import ex.model.state.Storage._
 import ex.model._
 
-object PaymentTransactionValidation extends ValidatedFunctions with Storage {
-
+object PaymentTransactionValidation extends ValidatedFunctions {
   def apply(address: Address, ruleStartTime: Timestamp)(paymentTransaction: PaymentTransaction) =
     for {
       time        <- lastConfirmedBlockTimestamp()
       maybeLastTx <- lastPaymentTransactionTimestamp(address)
-      r = maybeLastTx match {
+      r <- maybeLastTx match {
         case Some(lastTx) if lastTx >= paymentTransaction.timestamp && time > ruleStartTime =>
-          invalidNel("")
+          invalidNel("The transaction timestamp is in the past")
         case _ => valid(paymentTransaction)
       }
     } yield r

@@ -1,7 +1,5 @@
 package ex.model
 
-import scala.reflect.internal.util.Statistics.Quantity
-
 trait Transaction {
   def timestamp: Timestamp
 }

@@ -2,11 +2,11 @@ package ex
 
 import cats.Monoid
 import cats.data.{NonEmptyList, Validated}
-import cats.free.Free
+import cats.free.{Free, FreeT}
 import cats.{Order => _, _}
 import cats.implicits._
-import ex.model.state.Storage
-package object model extends Storage {
+import ex.model.state.Storage._
+package object model {
 
   type Height    = Int
   type Timestamp = Long
@@ -28,6 +28,8 @@ package object model extends Storage {
   type ChainId   = Byte
 
   type ValidationResult[+A] = Validated[NonEmptyList[String], A]
+
+  type FreeValidationResult[A] = FreeT[DSL, Validated[NonEmptyList[String],?], A]
 
   def liftVolume(v: Volume): Portfolio = v match {
     case WavesVolume(amt)        => Map(Waves -> amt)

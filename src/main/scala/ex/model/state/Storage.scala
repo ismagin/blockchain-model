@@ -5,16 +5,18 @@ import cats._
 import cats.free._
 import cats.implicits._
 import ex.model._
+import scala.language.implicitConversions
 
-trait Storage {
+object Storage {
 
   trait DSL[A]
   def lastPaymentTransactionTimestamp(a: Address): DSL[Option[Timestamp]] = ???
   def accBalance(a: Address): DSL[Portfolio]                              = ???
   def lastConfirmedBlockTimestamp(): DSL[Timestamp]                       = ???
 
-//  implicit def liftF[A, M[_]](d: DSL[A])(implicit M: Applicative[M]): FreeT[DSL, M, A] = FreeT.liftF(d)
-  implicit def lift[A](d: DSL[A]): Free[DSL, A]                                        = Free.liftF(d)
-  def pure[A](a: A): Free[DSL, A]                                                      = Free.pure(a)
+  def pure[A](a: A): Free[DSL, A]               = Free.pure(a)
+
+  implicit def liftDSL[A](dsl: DSL[A])(implicit M: Applicative[ValidationResult]): FreeValidationResult[A]               = FreeT.liftF(dsl)
+  implicit def liftValidation[A](v: ValidationResult[A])(implicit M: Functor[ValidationResult]): FreeValidationResult[A] = FreeT.liftT(v)
 
 }
