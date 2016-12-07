@@ -13,7 +13,8 @@ trait Storage {
   def accBalance(a: Address): DSL[Portfolio]                              = ???
   def lastConfirmedBlockTimestamp(): DSL[Timestamp]                       = ???
 
-  implicit def lift[A](d: DSL[A]): Free[DSL, A] = Free.liftF(d)
-  def pure[A](a: A): Free[DSL, A]               = Free.pure(a)
+//  implicit def liftF[A, M[_]](d: DSL[A])(implicit M: Applicative[M]): FreeT[DSL, M, A] = FreeT.liftF(d)
+  implicit def lift[A](d: DSL[A]): Free[DSL, A]                                        = Free.liftF(d)
+  def pure[A](a: A): Free[DSL, A]                                                      = Free.pure(a)
 
 }

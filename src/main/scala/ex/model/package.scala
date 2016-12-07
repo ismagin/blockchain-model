@@ -27,7 +27,7 @@ package object model extends Storage {
   type Version   = Byte
   type ChainId   = Byte
 
-  type ValidationResult[A] = Validated[NonEmptyList[String], A]
+  type ValidationResult[+A] = Validated[NonEmptyList[String], A]
 
   def liftVolume(v: Volume): Portfolio = v match {
     case WavesVolume(amt)        => Map(Waves -> amt)
