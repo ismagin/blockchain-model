@@ -10,10 +10,10 @@ object PaymentTransactionValidation extends ValidatedFunctions with Storage {
 //  creation time of the last transaction of the same type on payer's account.
 //  This rule works only after 1477958400000 on Testnet and after 1479168000000 on Mainnet.
 
-  def againstState(address: Address, ruleStartTime: Timestamp)(
+  def apply(address: Address, ruleStartTime: Timestamp)(
       paymentTransaction: PaymentTransaction) =
     for {
-      time        <- timeNow()
+      time        <- lastConfirmedBlockTimestamp()
       maybeLastTx <- lastPaymentTransactionTimestamp(address)
       r = maybeLastTx match {
         case Some(lastTx)
@@ -23,13 +23,4 @@ object PaymentTransactionValidation extends ValidatedFunctions with Storage {
       }
     } yield r
 
-  /*
-   Amount is positive, otherwise NegativeAmount validation result is returned.
-   Transaction's fee is positive, in other case InsufficientFee validation result is returned.
-   Adding fee to amount does not lead to Long overflow. In case of Long overflow OverflowError validation result will be returned.
-   Transaction's signature is valid. If not, InvalidSignature is returned.
-   */
-  def againstContent(chainId: Byte)(paymentTransaction: PaymentTransaction) = {
-    ???
-  }
 }
