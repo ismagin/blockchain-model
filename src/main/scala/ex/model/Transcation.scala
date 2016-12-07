@@ -19,34 +19,32 @@ case class GenesisTransaction private (recipient: Address,
 case class IssueTransaction(sender: Address,
                             name: Array[Byte],
                             description: Array[Byte],
-                            issue: AssetMoney,
+                            issue: AssetVolume,
                             decimals: Byte,
                             reissuable: Boolean,
-                            feeMoney: WavesMoney,
+                            feeMoney: WavesVolume,
                             timestamp: Timestamp)
     extends Transaction
 
 case class ReissueTransaction(sender: Address,
-                              issue: AssetMoney,
+                              issue: AssetVolume,
                               reissuable: Boolean,
-                              feeMoney: WavesMoney,
+                              feeMoney: WavesVolume,
                               timestamp: Timestamp)
     extends Transaction
 
 case class PaymentTransaction(sender: Address,
                               recipient: Address,
-                              quantity: WavesMoney,
-                              fee: WavesMoney,
+                              quantity: WavesVolume,
+                              fee: WavesVolume,
                               timestamp: Timestamp)
     extends Transaction
-    with SenderRecepientTransaction
 
 case class TransferTransaction(timestamp: Timestamp,
                                sender: Address,
                                recipient: Address,
-                               quantity: Money,
-                               feeMoney: Money,
+                               quantity: Volume,
+                               feeMoney: Volume,
                                attachment: Array[Byte])
     extends Transaction
-    with SenderRecepientTransaction
 

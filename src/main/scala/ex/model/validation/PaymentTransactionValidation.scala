@@ -1,6 +1,7 @@
 package ex.model.validation
 
-import cats.data.ValidatedFunctions
+import cats.data.{NonEmptyList, Validated, ValidatedFunctions}
+import cats.free.Free
 import ex.model.state.Storage
 import ex.model._
 
@@ -11,7 +12,8 @@ object PaymentTransactionValidation extends ValidatedFunctions with Storage {
 //  This rule works only after 1477958400000 on Testnet and after 1479168000000 on Mainnet.
 
   def apply(address: Address, ruleStartTime: Timestamp)(
-      paymentTransaction: PaymentTransaction) =
+      paymentTransaction: PaymentTransaction):
+  Free[_root_.ex.model.validation.PaymentTransactionValidation.DSL, Validated[NonEmptyList[BlockId], PaymentTransaction]] =
     for {
       time        <- lastConfirmedBlockTimestamp()
       maybeLastTx <- lastPaymentTransactionTimestamp(address)
