@@ -10,7 +10,7 @@ object TransactionValidation extends ValidatedFunctions with Storage {
 
   private val MaxTimeForUnconfirmed = 90 * 60 * 1000
 
-  def creationTime(ruleStartTime: Timestamp)(t: Transaction) =
+  def apply(ruleStartTime: Timestamp)(t: Transaction) =
     for {
       time <- lastConfirmedBlockTimestamp()
     } yield

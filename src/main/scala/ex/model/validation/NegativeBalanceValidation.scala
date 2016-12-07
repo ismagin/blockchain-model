@@ -8,7 +8,7 @@ import cats._
 import cats.free.Free
 object NegativeBalanceValidation extends ValidatedFunctions with Storage {
 
-  def negativeBalance(startTime: Timestamp)(t: FromToTransaction):
+  def apply(startTime: Timestamp)(t: FromToTransaction):
   Free[DSL, Validated[NonEmptyList[BlockId], FromToTransaction]] =
     for {
       time <- lastConfirmedBlockTimestamp()
