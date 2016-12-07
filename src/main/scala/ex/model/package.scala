@@ -18,4 +18,11 @@ package object model {
   case class WavesMoney(amount: Long)
   case class AssetMoney(amount: Long, tag: AssetId)
   type Money = Either[WavesMoney, AssetMoney]
+
+  case class Portfolio(wavesMoney: WavesMoney, assetMoney: Seq[AssetMoney])
+//
+//  case class Environment(chainId: Byte,
+//
+//                        )
+
 }
