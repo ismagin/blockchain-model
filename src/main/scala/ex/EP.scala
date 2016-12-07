@@ -12,5 +12,4 @@ import ex.model._
 
 object EP extends App with cats.data.ValidatedFunctions {
 
-
 }

@@ -9,8 +9,8 @@ import ex.model._
 trait Storage {
 
   trait DSL[A]
-  def lastPaymentTransactionTimestamp(a: Account): DSL[Option[Timestamp]] = ???
-  def accBalance(a: Account): DSL[Portfolio]                              = ???
+  def lastPaymentTransactionTimestamp(a: Address): DSL[Option[Timestamp]] = ???
+  def accBalance(a: Address): DSL[Portfolio]                              = ???
   def timeNow(): DSL[Timestamp]                                           = ???
 
   implicit def lift[A](d: DSL[A]): Free[DSL, A] = Free.liftF(d)
