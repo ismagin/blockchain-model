@@ -1,10 +1,8 @@
-package ex.model
+package ex.model.validation
 
 import cats.data.ValidatedFunctions
-import cats.free._
-import cats.syntax.all._
 import ex.model.state.Storage
-
+import ex.model.{Account, PaymentTransaction, Timestamp}
 
 object PaymentTransactionValidation extends ValidatedFunctions with Storage {
 
@@ -12,13 +10,17 @@ object PaymentTransactionValidation extends ValidatedFunctions with Storage {
 //  creation time of the last transaction of the same type on payer's account.
 //  This rule works only after 1477958400000 on Testnet and after 1479168000000 on Mainnet.
 
-  def validate(account: Account, ruleStartTime: Timestamp, paymentTransaction: PaymentTransaction) =
+  def againstState(account: Account,
+                   ruleStartTime: Timestamp,
+                   paymentTransaction: PaymentTransaction) =
     for {
       time        <- timeNow()
       maybeLastTx <- lastPaymentTransactionTimestamp(account)
       r = maybeLastTx match {
-        case Some(lastTx) if lastTx >= paymentTransaction.timestamp && time > ruleStartTime => invalidNel("")
-        case _                                                                              => valid(paymentTransaction)
+        case Some(lastTx)
+            if lastTx >= paymentTransaction.timestamp && time > ruleStartTime =>
+          invalidNel("")
+        case _ => valid(paymentTransaction)
       }
     } yield r
 
