@@ -2,9 +2,11 @@ package ex
 
 import cats.Monoid
 import cats.data.{NonEmptyList, Validated}
+import cats.free.Free
 import cats.{Order => _, _}
 import cats.implicits._
-package object model {
+import ex.model.state.Storage
+package object model extends Storage {
 
   type Height    = Int
   type Timestamp = Long

@@ -6,9 +6,11 @@ trait Transaction {
   def timestamp: Timestamp
 }
 
-trait SenderRecepientTransaction {
+trait FromToTransaction {
   def sender: Address
   def recipient: Address
+  def fee: Volume
+  def quantity: Volume
 }
 
 case class GenesisTransaction private (recipient: Address,
@@ -39,12 +41,13 @@ case class PaymentTransaction(sender: Address,
                               fee: WavesVolume,
                               timestamp: Timestamp)
     extends Transaction
+    with FromToTransaction
 
 case class TransferTransaction(timestamp: Timestamp,
                                sender: Address,
                                recipient: Address,
                                quantity: Volume,
-                               feeMoney: Volume,
+                               fee: Volume,
                                attachment: Array[Byte])
     extends Transaction
-
+    with FromToTransaction
