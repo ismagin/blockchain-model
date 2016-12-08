@@ -14,9 +14,10 @@ object Storage {
   def accBalance(a: Address): DSL[Portfolio]                              = ???
   def lastConfirmedBlockTimestamp(): DSL[Timestamp]                       = ???
 
-  def pure[A](a: A): Free[DSL, A]               = Free.pure(a)
+//  def pure[A](a: A): Free[DSL, A] = Free.pure(a)
 
-  implicit def liftDSL[A](dsl: DSL[A])(implicit M: Applicative[ValidationResult]): FreeValidationResult[A]               = FreeT.liftF(dsl)
-  implicit def liftValidation[A](v: ValidationResult[A])(implicit M: Functor[ValidationResult]): FreeValidationResult[A] = FreeT.liftT(v)
+  implicit def lift[A](dsl: DSL[A]): FreeValidationResult[A]                   = FreeT.liftF(dsl)
+  implicit def lift[A](v: ValidationResult[A]): FreeValidationResult[A] = FreeT.liftT(v)
 
+  def pure[A](a: A): FreeValidationResult[A] = lift(Validated.valid(a))
 }
