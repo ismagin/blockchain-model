@@ -4,7 +4,9 @@ import cats.data._
 import cats._
 import cats.free._
 import cats.implicits._
+import ex.model.Currency.Portfolio
 import ex.model._
+
 import scala.language.implicitConversions
 
 object Storage {

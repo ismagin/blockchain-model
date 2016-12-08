@@ -1,27 +1,16 @@
 package ex
 
 import cats.Monoid
-import cats.data.{NonEmptyList, Validated}
+import cats.data.{NonEmptyList, Validated, ValidatedFunctions}
 import cats.free.{Free, FreeT}
 import cats.{Order => _, _}
 import cats.implicits._
 import ex.model.state.Storage._
-package object model {
+package object model extends ValidatedFunctions {
 
   type Height    = Int
   type Timestamp = Long
   type BlockId   = String
-  type AssetId   = Array[Byte]
-
-  sealed trait Volume
-  case class WavesVolume(amount: Long)               extends Volume
-  case class AssetVolume(asset: Asset, amount: Long) extends Volume
-
-  sealed trait Money
-  case object Waves              extends Money
-  case class Asset(tag: AssetId) extends Money
-
-  type Portfolio = Map[Money, Long]
 
   type PublicKey = Array[Byte]
   type Version   = Byte
@@ -29,11 +18,8 @@ package object model {
 
   type ValidationResult[+A] = Validated[NonEmptyList[String], A]
 
-  type FreeValidationResult[A] = FreeT[DSL, Validated[NonEmptyList[String],?], A]
+  type FreeValidationResult[A] = FreeT[DSL, Validated[NonEmptyList[String], ?], A]
 
-  def liftVolume(v: Volume): Portfolio = v match {
-    case WavesVolume(amt)        => Map(Waves -> amt)
-    case AssetVolume(asset, amt) => Map(asset -> amt)
-  }
+  def validate(cond: => Boolean, err: => String): ValidationResult[Unit] = if (cond) valid(()) else invalidNel(err)
 
 }

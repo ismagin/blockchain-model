@@ -3,6 +3,7 @@ package ex.model.validation
 import cats.data.{NonEmptyList, Validated, ValidatedFunctions}
 import ex.model._
 import ex.model.state.Storage._
+import ex.model.Currency._
 import cats.implicits._
 import cats._
 import cats.syntax._
