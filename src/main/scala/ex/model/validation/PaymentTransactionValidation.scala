@@ -1,11 +1,9 @@
 package ex.model.validation
 
-import cats.data.{NonEmptyList, Validated, ValidatedFunctions}
-import cats.free.Free
-import ex.model.state.Storage._
+import cats.data.ValidatedFunctions
 import ex.model._
+import ex.model.state.Storage._
 import ex.model.transaction.PaymentTransaction
-import ex.model.validation.NegativeBalanceValidation.{invalidNel, valid}
 
 object PaymentTransactionValidation extends ValidatedFunctions {
   def apply(address: Address, startTime: Timestamp)(paymentTransaction: PaymentTransaction): FreeValidationResult[PaymentTransaction] =

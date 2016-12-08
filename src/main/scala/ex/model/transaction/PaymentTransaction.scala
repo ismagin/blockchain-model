@@ -1,12 +1,9 @@
 package ex.model.transaction
 
 import cats.data.ValidatedFunctions
-import ex.model._
-import ex.model.Currency._
-import cats._, cats.data.Validated, cats.instances.all._
-import cats._
-import cats.data.Validated
 import cats.syntax.all._
+import ex.model.Currency._
+import ex.model._
 
 sealed trait PaymentTransaction extends FromToTransaction {
   def sender: Address

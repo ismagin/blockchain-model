@@ -1,11 +1,8 @@
 package ex.model.validation
 
-import cats.{Applicative, Functor}
-import cats.data.{NonEmptyList, Validated, ValidatedFunctions}
-import cats.free.{Free, FreeT}
+import cats.data.ValidatedFunctions
 import ex.model._
 import ex.model.state.Storage._
-import cats.implicits._
 import ex.model.transaction.Transaction
 
 object TransactionValidation extends ValidatedFunctions {

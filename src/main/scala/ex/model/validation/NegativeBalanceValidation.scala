@@ -1,13 +1,10 @@
 package ex.model.validation
 
-import cats.data.{NonEmptyList, Validated, ValidatedFunctions}
+import cats.data.ValidatedFunctions
+import cats.implicits._
+import ex.model.Currency._
 import ex.model._
 import ex.model.state.Storage._
-import ex.model.Currency._
-import cats.implicits._
-import cats._
-import cats.syntax._
-import cats.free.{Free, FreeT}
 import ex.model.transaction.FromToTransaction
 object NegativeBalanceValidation extends ValidatedFunctions {
 

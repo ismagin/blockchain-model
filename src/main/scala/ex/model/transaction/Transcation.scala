@@ -1,7 +1,7 @@
 package ex.model.transaction
 
-import ex.model._
 import ex.model.Currency._
+import ex.model._
 
 trait Transaction {
   def timestamp: Timestamp

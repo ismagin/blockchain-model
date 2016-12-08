@@ -1,10 +1,8 @@
 package ex
 
-import cats.Monoid
 import cats.data.{NonEmptyList, Validated, ValidatedFunctions}
-import cats.free.{Free, FreeT}
-import cats.{Order => _, _}
-import cats.implicits._
+import cats.free.FreeT
+import cats.{Order => _}
 import ex.model.state.Storage._
 package object model extends ValidatedFunctions {
 
