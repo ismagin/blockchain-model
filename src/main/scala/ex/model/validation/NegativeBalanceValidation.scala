@@ -15,16 +15,13 @@ object NegativeBalanceValidation extends ValidatedFunctions {
       r <- if (time >= startTime)
         lift(valid(t))
       else {
-        validateAgainstState(t)
+        for {
+          senderBalance <- accBalance(t.sender)
+          res <- if (senderBalanceStaysPositive(senderBalance, t.quantity, t.fee)) valid(t)
+          else invalidNel("Insufficient Sender Funds")
+        } yield res
       }
     } yield r
-
-  def validateAgainstState(t: FromToTransaction): FreeValidationResult[FromToTransaction] =
-    for {
-      senderBalance <- accBalance(t.sender)
-      res <- if (senderBalanceStaysPositive(senderBalance, t.quantity, t.fee)) valid(t)
-      else invalidNel("Insufficient Sender Funds")
-    } yield res
 
   private def senderBalanceStaysPositive(senderBalance: Portfolio, quantity: Volume, fee: Volume): Boolean = {
     val totalTransfer = liftVolume(quantity) combine liftVolume(fee)
