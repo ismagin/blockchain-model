@@ -28,9 +28,10 @@ object PaymentTransaction extends ValidatedFunctions {
 
     val x = validate(quantity.amount > 0, "Quantity must be greater than zero") |@|
         validate(fee.amount > 0, "Fee must be greater than zero") |@|
+        validate(sender.chainId == recipient.chainId, "Sener and recipient are from different chains") |@|
         validate(Try { Math.addExact(quantity.amount, fee.amount) }.isSuccess, "Quantity + fee must me less than Long.MaxValue")
 
-    x.map((_, _, _) => PaymentTransactionImpl(sender, recipient, quantity, fee, timestamp))
+    x.map((_, _, _, _) => PaymentTransactionImpl(sender, recipient, quantity, fee, timestamp))
 
   }
 }
