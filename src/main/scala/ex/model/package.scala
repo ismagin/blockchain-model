@@ -18,6 +18,6 @@ package object model extends ValidatedFunctions {
 
   type FreeValidationResult[A] = FreeT[DSL, Validated[NonEmptyList[String], ?], A]
 
-  def validate(cond: => Boolean, err: => String): ValidationResult[Unit] = if (cond) valid(()) else invalidNel(err)
+  def validate(validIf: => Boolean, errorMessage: => String): ValidationResult[Unit] = if (validIf) valid(()) else invalidNel(errorMessage)
 
 }

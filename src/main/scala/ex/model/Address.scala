@@ -2,6 +2,7 @@ package ex.model
 
 import cats.data.ValidatedFunctions
 import ex.crypto.ScorexHashChain
+import scrypto.encode.Base58
 
 sealed trait Address {
 
@@ -14,18 +15,22 @@ object Address extends ValidatedFunctions {
 
   private case class AddressImpl(version: Version, chainId: ChainId, publicKey: PublicKey) extends Address
 
+  val ChecksumLength = 4
+  val PkLength       = 20
+
   def apply(bytes: Array[Byte]): ValidationResult[Address] = {
     if (bytes.length != 26) {
-      invalidNel(s"Invalid length: ${bytes.length}. Required length is 26")
+      invalidNel(s"Invalid length: expected: 26 actual: ${bytes.length}")
     } else {
-      val ver      = bytes(0)
-      val chainId  = bytes(1)
-      val pk       = bytes.slice(2, 23)
-      val checksum = bytes.takeRight(4)
-      if (ScorexHashChain.hash(bytes) sameElements checksum) {
-        valid(AddressImpl(ver, chainId, pk))
+      val checksum     = bytes.takeRight(ChecksumLength)
+      val dropChecksum = bytes.dropRight(ChecksumLength)
+      if (ScorexHashChain.hash(dropChecksum).take(ChecksumLength) sameElements checksum) {
+        val ver     = bytes(0)
+        val chainId = bytes(1)
+        val pkHash  = bytes.slice(2, 2 + PkLength)
+        valid(AddressImpl(ver, chainId, pkHash))
       } else {
-        invalidNel("Invalid checksum!")
+        invalidNel(s"Invalid checksum: expected: ${ScorexHashChain.hash(bytes)}")
       }
     }
   }
