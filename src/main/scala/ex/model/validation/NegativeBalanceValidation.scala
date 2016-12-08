@@ -7,6 +7,7 @@ import cats.implicits._
 import cats._
 import cats.syntax._
 import cats.free.{Free, FreeT}
+import ex.model.transaction.FromToTransaction
 object NegativeBalanceValidation extends ValidatedFunctions {
 
   def apply(startTime: Timestamp)(t: FromToTransaction): FreeValidationResult[FromToTransaction] =

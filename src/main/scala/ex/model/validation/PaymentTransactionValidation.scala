@@ -4,10 +4,11 @@ import cats.data.{NonEmptyList, Validated, ValidatedFunctions}
 import cats.free.Free
 import ex.model.state.Storage._
 import ex.model._
+import ex.model.transaction.PaymentTransaction
 import ex.model.validation.NegativeBalanceValidation.{invalidNel, valid}
 
 object PaymentTransactionValidation extends ValidatedFunctions {
-  def apply(address: Address, startTime: Timestamp)(paymentTransaction: PaymentTransaction): FreeValidationResult[FromToTransaction] =
+  def apply(address: Address, startTime: Timestamp)(paymentTransaction: PaymentTransaction): FreeValidationResult[PaymentTransaction] =
     for {
       time <- lastConfirmedBlockTimestamp()
       r <- if (time >= startTime)
@@ -17,7 +18,7 @@ object PaymentTransactionValidation extends ValidatedFunctions {
           maybeLastTx <- lastPaymentTransactionTimestamp(address)
           res <- maybeLastTx match {
             case Some(lastTx) if lastTx >= paymentTransaction.timestamp =>
-              invalidNel("The transaction timestamp is in the past")
+              invalidNel("Transaction timestamp is in the past")
             case _ => valid(paymentTransaction)
           }
         } yield res

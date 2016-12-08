@@ -8,16 +8,19 @@ import cats.data.{NonEmptyList => NEL}
 import cats.data.ValidatedFunctions
 import cats.instances.all._
 import ex.model._
-//import ex.model.validation.{NegativeBalanceValidation, PaymentTransactionValidation, TransactionValidation}
+import ex.model.transaction.{FromToTransaction, PaymentTransaction, Transaction}
+import ex.model.validation.{NegativeBalanceValidation, PaymentTransactionValidation, TransactionValidation}
 
 object EP extends App with cats.data.ValidatedFunctions {
 
-  val a: Address = ???
+  val a: Address            = ???
+  val t: PaymentTransaction = ???
 
-//  def validate                                          = TransactionValidation(1) _
-//  def validateBalance(ftt: FromToTransaction)           = NegativeBalanceValidation(123) _
-//  def validatePaymentTransaction(p: PaymentTransaction) = PaymentTransactionValidation(a, 123) _
+  val validate: (Transaction) => FreeValidationResult[Transaction]                                 = TransactionValidation(1)
+  val validateBalance: (FromToTransaction) => FreeValidationResult[FromToTransaction]              = NegativeBalanceValidation(123)
+  val validatePaymentTransaction: (PaymentTransaction) => FreeValidationResult[PaymentTransaction] = PaymentTransactionValidation(a, 123)
 
+//  val x = validatePaymentTransaction(t).flatMap(validateBalance).flatMap(validate)
 
-
+//  validate compose validate
 }

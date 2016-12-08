@@ -6,6 +6,7 @@ import cats.free.{Free, FreeT}
 import ex.model._
 import ex.model.state.Storage._
 import cats.implicits._
+import ex.model.transaction.Transaction
 
 object TransactionValidation extends ValidatedFunctions {
 

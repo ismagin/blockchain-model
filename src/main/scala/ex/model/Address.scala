@@ -12,20 +12,21 @@ sealed trait Address {
 
 object Address extends ValidatedFunctions {
 
-  private case class AddressImpl(version: Version,
-                                 chainId: ChainId,
-                                 publicKey: PublicKey)
-      extends Address
+  private case class AddressImpl(version: Version, chainId: ChainId, publicKey: PublicKey) extends Address
 
   def apply(bytes: Array[Byte]): ValidationResult[Address] = {
-    val ver      = bytes(0)
-    val chainId  = bytes(1)
-    val pk       = bytes.slice(2, 23)
-    val checksum = bytes.takeRight(4)
-    if (ScorexHashChain.hash(bytes) sameElements checksum) {
-      valid(AddressImpl(ver, chainId, pk))
+    if (bytes.length != 26) {
+      invalidNel(s"Invalid length: ${bytes.length}. Required length is 26")
     } else {
-      invalidNel("Invalid checksum!")
+      val ver      = bytes(0)
+      val chainId  = bytes(1)
+      val pk       = bytes.slice(2, 23)
+      val checksum = bytes.takeRight(4)
+      if (ScorexHashChain.hash(bytes) sameElements checksum) {
+        valid(AddressImpl(ver, chainId, pk))
+      } else {
+        invalidNel("Invalid checksum!")
+      }
     }
   }
 }
