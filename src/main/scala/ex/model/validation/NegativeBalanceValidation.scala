@@ -1,12 +1,12 @@
 package ex.model.validation
 
-import cats.data.ValidatedFunctions
+import cats.data.Validated._
 import cats.implicits._
 import ex.model.Currency._
 import ex.model._
 import ex.model.state.Storage._
 import ex.model.transaction.FromToTransaction
-object NegativeBalanceValidation extends ValidatedFunctions {
+object NegativeBalanceValidation {
 
   def apply(startTime: Timestamp)(t: FromToTransaction): FreeValidationResult[FromToTransaction] =
     for {

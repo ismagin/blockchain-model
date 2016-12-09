@@ -1,11 +1,10 @@
 package ex.model.validation
 
 import cats.data.Validated._
-import com.github.nscala_time.time.DurationBuilder
+import com.github.nscala_time.time.Imports._
 import ex.model._
 import ex.model.state.Storage._
 import ex.model.transaction.Transaction
-import com.github.nscala_time.time.Imports._
 
 object MaxTimeUnconfirmedValidation {
 

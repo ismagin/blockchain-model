@@ -14,7 +14,7 @@ object Storage {
   case class LastConfirmedBlockTimestamp() extends DSL[Timestamp]
 
   def lastConfirmedBlockTimestamp(): DSL[Timestamp]                       = LastConfirmedBlockTimestamp()
-  def lastPaymentTransactionTimestamp(a: Address): DSL[Option[Timestamp]] = ???
+  def previousPaymentTransactionTimestamp(a: Address): DSL[Option[Timestamp]] = ???
   def accBalance(a: Address): DSL[Portfolio]                              = ???
 
   implicit def lift[A](dsl: DSL[A]): Free[DSL, A]                       = Free.liftF(dsl)

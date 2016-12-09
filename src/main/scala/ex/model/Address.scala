@@ -1,8 +1,7 @@
 package ex.model
 
-import cats.data.ValidatedFunctions
+import cats.data.Validated._
 import ex.crypto.ScorexHashChain
-import scrypto.encode.Base58
 
 sealed trait Address {
 
@@ -11,7 +10,7 @@ sealed trait Address {
   def chainId: ChainId
 }
 
-object Address extends ValidatedFunctions {
+object Address {
 
   private case class AddressImpl(version: Version, chainId: ChainId, publicKey: PublicKey) extends Address
 

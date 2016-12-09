@@ -1,15 +1,10 @@
 package ex.model.validation
 
-import cats.data.{NonEmptyList, Validated}
 import cats.{Id, ~>}
-import ex.model.Timestamp
-import ex.model.state.Storage.{DSL, LastConfirmedBlockTimestamp}
-import ex.model.transaction.Transaction
-import org.scalatest.{FlatSpec, Matchers}
-import cats.data.Validated._
-import ex.testdata._
 import com.github.nscala_time.time.Imports._
-import cats.data.Validated.Invalid
+import ex.model.state.Storage.{DSL, LastConfirmedBlockTimestamp}
+import ex.testdata._
+import org.scalatest.{FlatSpec, Matchers}
 
 class MaxTimeUnconfirmedValidationTest extends FlatSpec with Matchers {
 
@@ -22,20 +17,20 @@ class MaxTimeUnconfirmedValidationTest extends FlatSpec with Matchers {
   }
 
   "MaxTimeUnconfirmedValidation" should "pass if rule is not applicable yet" in {
-    val transcation = BananaTranscation(lastBlockTime + 10.minute.millis)
-    val validation  = MaxTimeUnconfirmedValidation(lastBlockTime + 5.minutes.millis)(transcation)
-    validation.foldMap(interp) shouldBe valid(transcation)
+    val transaction = BananaTranscation(lastBlockTime + 10.minute.millis)
+    val validation  = MaxTimeUnconfirmedValidation(lastBlockTime + 5.minutes.millis)(transaction)
+    validation.foldMap(interp) shouldBe a[ValidationSuccess]
   }
 
   it should "pass if less than 90 minutes since lastBlockTime" in {
-    val transcation = BananaTranscation(lastBlockTime + 85.minutes.millis)
-    val validation  = MaxTimeUnconfirmedValidation(0)(transcation)
-    validation.foldMap(interp) shouldBe valid(transcation)
+    val transaction = BananaTranscation(lastBlockTime + 85.minutes.millis)
+    val validation  = MaxTimeUnconfirmedValidation(0)(transaction)
+    validation.foldMap(interp) shouldBe a[ValidationSuccess]
   }
 
   it should "fail if beyond 90 minutes since lastBlockTime" in {
-    val transcation = BananaTranscation(lastBlockTime + 91.minutes.millis)
-    val validation  = MaxTimeUnconfirmedValidation(0)(transcation)
+    val transaction = BananaTranscation(lastBlockTime + 91.minutes.millis)
+    val validation  = MaxTimeUnconfirmedValidation(0)(transaction)
     validation.foldMap(interp) shouldBe a[ValidationError]
   }
 }

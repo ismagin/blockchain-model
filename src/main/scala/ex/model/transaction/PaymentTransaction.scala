@@ -1,6 +1,6 @@
 package ex.model.transaction
 
-import cats.data.ValidatedFunctions
+import cats.data.Validated._
 import cats.syntax.all._
 import ex.model.Currency._
 import ex.model._
@@ -15,7 +15,7 @@ sealed trait PaymentTransaction extends FromToTransaction {
   def timestamp: Timestamp
 }
 
-object PaymentTransaction extends ValidatedFunctions {
+object PaymentTransaction {
 
   private case class PaymentTransactionImpl(sender: Address, recipient: Address, quantity: WavesVolume, fee: WavesVolume, timestamp: Timestamp)
       extends PaymentTransaction
