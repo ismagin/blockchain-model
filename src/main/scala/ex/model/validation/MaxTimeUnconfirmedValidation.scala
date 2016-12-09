@@ -5,7 +5,7 @@ import ex.model._
 import ex.model.state.Storage._
 import ex.model.transaction.Transaction
 
-object TransactionValidation extends ValidatedFunctions {
+object MaxTimeUnconfirmedValidation extends ValidatedFunctions {
 
   private val MaxTimeForUnconfirmed = 90 * 60 * 1000
 
