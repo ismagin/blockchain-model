@@ -13,5 +13,6 @@ scalacOptions := Seq("-Ypartial-unification", "-feature", "-language:higherKinds
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0"
 libraryDependencies += "org.typelevel" %% "cats" % "0.8.1"
+libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "2.14.0"
 
 libraryDependencies += "org.consensusresearch" %% "scrypto" % "1.2.0-RC3" exclude("com.typesafe.play", "play-json_2.11")
