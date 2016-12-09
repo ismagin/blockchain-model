@@ -1,10 +1,11 @@
 package ex
 
 import cats.data.{NonEmptyList, Validated, ValidatedFunctions}
-import cats.free.FreeT
+import cats.free.{Free, FreeT}
 import cats.{Order => _}
 import ex.model.state.Storage._
-package object model extends ValidatedFunctions {
+import cats.data.Validated._
+package object model {
 
   type Height    = Int
   type Timestamp = Long
@@ -16,7 +17,7 @@ package object model extends ValidatedFunctions {
 
   type ValidationResult[+A] = Validated[NonEmptyList[String], A]
 
-  type FreeValidationResult[A] = FreeT[DSL, Validated[NonEmptyList[String], ?], A]
+  type FreeValidationResult[A] = Free[DSL, Validated[NonEmptyList[String], A]]
 
   def validate(validIf: => Boolean, errorMessage: => String): ValidationResult[Unit] = if (validIf) valid(()) else invalidNel(errorMessage)
 

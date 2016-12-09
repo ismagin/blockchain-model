@@ -10,12 +10,14 @@ import scala.language.implicitConversions
 object Storage {
 
   trait DSL[A]
+
+  case class LastConfirmedBlockTimestamp() extends DSL[Timestamp]
+
+  def lastConfirmedBlockTimestamp(): DSL[Timestamp]                       = LastConfirmedBlockTimestamp()
   def lastPaymentTransactionTimestamp(a: Address): DSL[Option[Timestamp]] = ???
   def accBalance(a: Address): DSL[Portfolio]                              = ???
-  def lastConfirmedBlockTimestamp(): DSL[Timestamp]                       = ???
 
-  implicit def lift[A](dsl: DSL[A]): FreeValidationResult[A]            = FreeT.liftF(dsl)
-  implicit def lift[A](v: ValidationResult[A]): FreeValidationResult[A] = FreeT.liftT(v)
+  implicit def lift[A](dsl: DSL[A]): Free[DSL, A]                       = Free.liftF(dsl)
+  implicit def lift[A](v: ValidationResult[A]): FreeValidationResult[A] = Free.pure(v)
 
-  def pure[A](a: A): FreeValidationResult[A] = lift(Validated.valid(a))
 }

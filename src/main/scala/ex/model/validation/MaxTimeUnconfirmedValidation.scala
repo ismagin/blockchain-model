@@ -1,11 +1,11 @@
 package ex.model.validation
 
-import cats.data.ValidatedFunctions
+import cats.data.Validated._
 import ex.model._
 import ex.model.state.Storage._
 import ex.model.transaction.Transaction
 
-object MaxTimeUnconfirmedValidation extends ValidatedFunctions {
+object MaxTimeUnconfirmedValidation {
 
   private val MaxTimeForUnconfirmed = 90 * 60 * 1000
 

@@ -9,7 +9,7 @@ object EP extends App with cats.data.ValidatedFunctions {
 
   val t: PaymentTransaction = ???
 
-  val validate: (Transaction) => FreeValidationResult[Transaction]                                 = MaxTimeUnconfirmedValidation(1)
+  val maxTimeUnconfirmed: (Transaction) => FreeValidationResult[Transaction]                                 = MaxTimeUnconfirmedValidation(1)
   val validateBalance: (FromToTransaction) => FreeValidationResult[FromToTransaction]              = NegativeBalanceValidation(123)
   val validatePaymentTransaction: (PaymentTransaction) => FreeValidationResult[PaymentTransaction] = PaymentTransactionValidation(123)
 
