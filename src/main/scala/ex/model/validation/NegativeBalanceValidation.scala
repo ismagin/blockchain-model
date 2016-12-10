@@ -12,35 +12,17 @@ import cats.{Id, ~>}
 import ex.model.state.Storage
 import ex.model.state.Storage.DSL
 
-import scala.annotation.tailrec
-
 object NegativeBalanceValidation {
 
   type TmpAccountStates = Map[Address, Portfolio]
 
-  def apply(startTime: Timestamp)(t: FromToTransaction): FreeValidationResult[FromToTransaction] =
-    for {
-      time <- Storage.lastConfirmedBlockTimestamp()
-      r <- if (time >= startTime)
-        Storage.pure(valid(t))
-      else {
-        for {
-          senderBalance <- Storage.accBalance(t.sender)
-          res <- if (senderBalanceStaysPositive(senderBalance, t.quantity, t.fee)) valid(t)
-          else invalidNel("Insufficient Sender Funds")
-        } yield res
-      }
-    } yield r
-
-  private def senderBalanceStaysPositive(senderBalance: Portfolio, quantity: Volume, fee: Volume): Boolean = {
-    val totalTransfer = liftVolume(quantity) combine liftVolume(fee)
-    totalTransfer.forall {
-      case (m: Money, amt: Long) =>
-        senderBalance.get(m) match {
-          case Some(v) if v >= amt => true
-          case _                   => false
-        }
-    }
+  def apply(tmp: TmpAccountStates, seq: Seq[FromToTransaction]): FreeValidationResult[TmpAccountStates] = seq match {
+    case h :: tail =>
+      validateOne(tmp, h).map {
+        case Valid(state) => apply(state, tail)
+        case Invalid(e)   => Storage.pure(invalid[NonEmptyList[String], TmpAccountStates](e))
+      }.flatten
+    case _ => Storage.pure(valid(tmp))
   }
 
   def effectiveAccountBalance(temporaryState: TmpAccountStates, a: Address): Free[DSL, (Portfolio, TmpAccountStates)] = {
@@ -75,14 +57,5 @@ object NegativeBalanceValidation {
           s"Transaction application leads to negative balance of sender(${ftt.sender}):" +
             s" before: $senderBalance, diff: $totalTransfer. result: $newSenderBalance")
       }
-
-  def validate(tmp: TmpAccountStates, seq: Seq[FromToTransaction]): FreeValidationResult[TmpAccountStates] = seq match {
-    case h :: tail =>
-      validateOne(tmp, h).map {
-        case Valid(state) => validate(state, tail)
-        case Invalid(e)   => Storage.pure(invalid[NonEmptyList[String], TmpAccountStates](e))
-      }.flatten
-    case _ => Storage.pure(valid(tmp))
-  }
 
 }
