@@ -1,8 +1,9 @@
 package ex.model.validation
 
-import cats.data.StateT
+import cats.data.{NonEmptyList, StateT, Validated}
 import cats.data.Validated._
 import cats.free.Free
+import cats.free.Free.{FlatMapped, Pure, Suspend}
 import cats.implicits._
 import ex.model.Currency._
 import ex.model._
@@ -11,9 +12,11 @@ import cats.{Id, ~>}
 import ex.model.state.Storage
 import ex.model.state.Storage.DSL
 
+import scala.annotation.tailrec
+
 object NegativeBalanceValidation {
 
-  type AccBalances = Map[Address, Portfolio]
+  type TmpAccountStates = Map[Address, Portfolio]
 
   def apply(startTime: Timestamp)(t: FromToTransaction): FreeValidationResult[FromToTransaction] =
     for {
@@ -40,26 +43,24 @@ object NegativeBalanceValidation {
     }
   }
 
-  def effectiveAccountBalance(temporaryState: AccBalances, a: Address): Free[DSL, (Portfolio, AccBalances)] = {
+  def effectiveAccountBalance(temporaryState: TmpAccountStates, a: Address): Free[DSL, (Portfolio, TmpAccountStates)] = {
     temporaryState.get(a) match {
       case Some(p) => Storage.pure((p, temporaryState))
       case None    => Storage.accBalance(a).map(p => (p, temporaryState + (a -> p)))
     }
   }
 
-  def senderRecipientBalances(temporaryState: AccBalances, s: Address, r: Address): Free[DSL, (Portfolio, Portfolio, AccBalances)] =
+  def senderRecipientBalances(temporaryState: TmpAccountStates, s: Address, r: Address): Free[DSL, (Portfolio, Portfolio, TmpAccountStates)] =
     for {
       r1 <- effectiveAccountBalance(temporaryState, s)
       r2 <- effectiveAccountBalance(r1._2, r)
     } yield (r1._1, r2._1, r2._2)
 
-  def setTemporaryState(temporaryState: AccBalances, a: Address, p: Portfolio): AccBalances = ???
+  def isPositive(p: Portfolio): Boolean = p.values.forall(_ >= 0)
 
-  def isPositive(p: Portfolio): Boolean = ???
+  def negate(p: Portfolio): Portfolio = p.map { case (k, v) => (k, -v) }
 
-  def negate(p: Portfolio): Portfolio = ???
-
-  def stateful(temporaryState: AccBalances, ftt: FromToTransaction): FreeValidationResult[(FromToTransaction, AccBalances)] =
+  def validateOne(temporaryState: TmpAccountStates, ftt: FromToTransaction): FreeValidationResult[TmpAccountStates] =
     for {
       r <- senderRecipientBalances(temporaryState, ftt.sender, ftt.recipient)
       (senderBalance, recipientBalance, updatedState) = r
@@ -68,10 +69,20 @@ object NegativeBalanceValidation {
       newRecipientBalance                             = recipientBalance combine totalTransfer
     } yield
       if (isPositive(newSenderBalance)) {
-        valid((ftt, updatedState ++ Map(ftt.sender -> newSenderBalance, ftt.recipient -> newRecipientBalance)))
+        valid(updatedState ++ Map(ftt.sender -> newSenderBalance, ftt.recipient -> newRecipientBalance))
       } else {
         invalidNel(
           s"Transaction application leads to negative balance of sender(${ftt.sender}):" +
             s" before: $senderBalance, diff: $totalTransfer. result: $newSenderBalance")
       }
+
+  def validate(tmp: TmpAccountStates, seq: Seq[FromToTransaction]): FreeValidationResult[TmpAccountStates] = seq match {
+    case h :: tail =>
+      validateOne(tmp, h).map {
+        case Valid(state) => validate(state, tail)
+        case Invalid(e)   => Storage.pure(invalid[NonEmptyList[String], TmpAccountStates](e))
+      }.flatten
+    case _ => Storage.pure(valid(tmp))
+  }
+
 }
