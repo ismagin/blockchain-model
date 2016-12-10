@@ -11,13 +11,13 @@ object Storage {
 
   trait DSL[A]
 
-  case class LastConfirmedBlockTimestamp() extends DSL[Timestamp]
+  case class LastConfirmedBlockTimestamp()     extends DSL[Timestamp]
+  case class PrevPaymentTransactionTimestamp() extends DSL[Option[Timestamp]]
 
-  def lastConfirmedBlockTimestamp(): DSL[Timestamp]                       = LastConfirmedBlockTimestamp()
-  def previousPaymentTransactionTimestamp(a: Address): DSL[Option[Timestamp]] = ???
-  def accBalance(a: Address): DSL[Portfolio]                              = ???
+  def lastConfirmedBlockTimestamp(): Free[DSL, Timestamp]                           = Free.liftF(LastConfirmedBlockTimestamp())
+  def previousPaymentTransactionTimestamp(a: Address): Free[DSL, Option[Timestamp]] = Free.liftF(PrevPaymentTransactionTimestamp())
+  def accBalance(a: Address): Free[DSL, Portfolio]                                  = ???
 
-  implicit def lift[A](dsl: DSL[A]): Free[DSL, A]                       = Free.liftF(dsl)
-  implicit def lift[A](v: ValidationResult[A]): FreeValidationResult[A] = Free.pure(v)
+  implicit def pure[A](a: A): Free[DSL,A] = Free.pure(a)
 
 }

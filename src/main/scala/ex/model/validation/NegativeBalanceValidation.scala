@@ -1,21 +1,28 @@
 package ex.model.validation
 
+import cats.data.StateT
 import cats.data.Validated._
+import cats.free.Free
 import cats.implicits._
 import ex.model.Currency._
 import ex.model._
-import ex.model.state.Storage._
 import ex.model.transaction.FromToTransaction
+import cats.{Id, ~>}
+import ex.model.state.Storage
+import ex.model.state.Storage.DSL
+
 object NegativeBalanceValidation {
+
+  type AccBalances = Map[Address, Portfolio]
 
   def apply(startTime: Timestamp)(t: FromToTransaction): FreeValidationResult[FromToTransaction] =
     for {
-      time <- lastConfirmedBlockTimestamp()
+      time <- Storage.lastConfirmedBlockTimestamp()
       r <- if (time >= startTime)
-        lift(valid(t))
+        Storage.pure(valid(t))
       else {
         for {
-          senderBalance <- accBalance(t.sender)
+          senderBalance <- Storage.accBalance(t.sender)
           res <- if (senderBalanceStaysPositive(senderBalance, t.quantity, t.fee)) valid(t)
           else invalidNel("Insufficient Sender Funds")
         } yield res
@@ -32,4 +39,39 @@ object NegativeBalanceValidation {
         }
     }
   }
+
+  def effectiveAccountBalance(temporaryState: AccBalances, a: Address): Free[DSL, (Portfolio, AccBalances)] = {
+    temporaryState.get(a) match {
+      case Some(p) => Storage.pure((p, temporaryState))
+      case None    => Storage.accBalance(a).map(p => (p, temporaryState + (a -> p)))
+    }
+  }
+
+  def senderRecipientBalances(temporaryState: AccBalances, s: Address, r: Address): Free[DSL, (Portfolio, Portfolio, AccBalances)] =
+    for {
+      r1 <- effectiveAccountBalance(temporaryState, s)
+      r2 <- effectiveAccountBalance(r1._2, r)
+    } yield (r1._1, r2._1, r2._2)
+
+  def setTemporaryState(temporaryState: AccBalances, a: Address, p: Portfolio): AccBalances = ???
+
+  def isPositive(p: Portfolio): Boolean = ???
+
+  def negate(p: Portfolio): Portfolio = ???
+
+  def stateful(temporaryState: AccBalances, ftt: FromToTransaction): FreeValidationResult[(FromToTransaction, AccBalances)] =
+    for {
+      r <- senderRecipientBalances(temporaryState, ftt.sender, ftt.recipient)
+      (senderBalance, recipientBalance, updatedState) = r
+      totalTransfer                                   = liftVolume(ftt.quantity) combine liftVolume(ftt.fee)
+      newSenderBalance                                = senderBalance combine negate(totalTransfer)
+      newRecipientBalance                             = recipientBalance combine totalTransfer
+    } yield
+      if (isPositive(newSenderBalance)) {
+        valid((ftt, updatedState ++ Map(ftt.sender -> newSenderBalance, ftt.recipient -> newRecipientBalance)))
+      } else {
+        invalidNel(
+          s"Transaction application leads to negative balance of sender(${ftt.sender}):" +
+            s" before: $senderBalance, diff: $totalTransfer. result: $newSenderBalance")
+      }
 }
