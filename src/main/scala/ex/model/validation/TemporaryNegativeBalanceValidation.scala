@@ -16,10 +16,10 @@ object TemporaryNegativeBalanceValidation {
 
   def apply(tmp: StateOverrides, seq: Seq[FromToTransaction]): FreeValidationResult[StateOverrides] = seq match {
     case h :: tail =>
-      validateOne(tmp, h).map {
-        case Valid(state) => apply(state, tail)
-        case Invalid(e)   => Storage.pure(invalid[NonEmptyList[String], StateOverrides](e))
-      }.flatten
+      (for {
+        st   <- validateOne(tmp, h).toEitherT
+        rest <- apply(st, tail).toEitherT
+      } yield rest).toFree
     case _ => Storage.pure(valid(tmp))
   }
 

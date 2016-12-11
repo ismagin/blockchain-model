@@ -12,11 +12,11 @@ package object model {
   def eitherTFreeToFreeValidated[DSL[_], A, B](eit: EitherT[Free[DSL, ?], B, A]): Free[DSL, Validated[B, A]] = eit.value.map(Validated.fromEither)
 
   implicit class FVOps[DSL[_], A, B](fv: Free[DSL, Validated[B, A]]) {
-    def pack: EitherT[Free[DSL, ?], B, A] = freeValidatedToEitherTFree(fv)
+    def toEitherT: EitherT[Free[DSL, ?], B, A] = freeValidatedToEitherTFree(fv)
   }
 
   implicit class EiTFOps[DSL[_], A, B](eit: EitherT[Free[DSL, ?], B, A]) {
-    def unpack: Free[DSL, Validated[B, A]] = eitherTFreeToFreeValidated(eit)
+    def toFree: Free[DSL, Validated[B, A]] = eitherTFreeToFreeValidated(eit)
   }
 
   type Timestamp = Long

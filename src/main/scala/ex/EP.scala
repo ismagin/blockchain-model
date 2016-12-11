@@ -12,9 +12,9 @@ object EP extends App with cats.data.ValidatedFunctions {
 
   def combineMonadically(t: PaymentTransaction): FreeValidationResult[PaymentTransaction] =
     (for {
-      s1 <- maxTimeUnconfirmed(t).pack
-      s2 <- validatePaymentTransaction(s1).pack
-    } yield s2).unpack
+      s1 <- maxTimeUnconfirmed(t).toEitherT
+      s2 <- validatePaymentTransaction(s1).toEitherT
+    } yield s2).toFree
 
   def combineApplicatively(t: PaymentTransaction): FreeValidationResult[PaymentTransaction] =
     for {
