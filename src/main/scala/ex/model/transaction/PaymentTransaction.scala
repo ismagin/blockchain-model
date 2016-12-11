@@ -24,7 +24,7 @@ object PaymentTransaction {
             recipient: Address,
             quantity: WavesVolume,
             fee: WavesVolume,
-            timestamp: Timestamp): ValidationResult[PaymentTransaction] = {
+            timestamp: Timestamp): AccValidationResult[PaymentTransaction] = {
 
     val x = validate(quantity.amount > 0, "Quantity must be greater than zero") |@|
         validate(fee.amount > 0, "Fee must be greater than zero") |@|

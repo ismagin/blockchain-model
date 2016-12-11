@@ -2,6 +2,7 @@ package ex.model
 
 import cats.data.Validated._
 import ex.crypto.ScorexHashChain
+import ex.model.Address._
 
 sealed trait Address {
 
@@ -12,12 +13,16 @@ sealed trait Address {
 
 object Address {
 
+  type PublicKey = Array[Byte]
+  type Version   = Byte
+  type ChainId   = Byte
+
   private case class AddressImpl(version: Version, chainId: ChainId, publicKey: PublicKey) extends Address
 
   val ChecksumLength = 4
   val PkLength       = 20
 
-  def apply(bytes: Array[Byte]): ValidationResult[Address] = {
+  def apply(bytes: Array[Byte]): AccValidationResult[Address] = {
     if (bytes.length != 26) {
       invalidNel(s"Invalid length: expected: 26 actual: ${bytes.length}")
     } else {
