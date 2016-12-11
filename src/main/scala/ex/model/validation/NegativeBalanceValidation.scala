@@ -46,16 +46,16 @@ object NegativeBalanceValidation {
     for {
       r <- senderRecipientBalances(temporaryState, ftt.sender, ftt.recipient)
       (senderBalance, recipientBalance, updatedState) = r
-      totalTransfer                                   = liftVolume(ftt.quantity) combine liftVolume(ftt.fee)
-      newSenderBalance                                = senderBalance combine negate(totalTransfer)
-      newRecipientBalance                             = recipientBalance combine totalTransfer
+      totalWithdraw                                   = liftVolume(ftt.quantity) combine liftVolume(ftt.fee)
+      newSenderBalance                                = senderBalance combine negate(totalWithdraw)
+      newRecipientBalance                             = recipientBalance combine liftVolume(ftt.quantity)
     } yield
       if (isPositive(newSenderBalance)) {
         valid(updatedState ++ Map(ftt.sender -> newSenderBalance, ftt.recipient -> newRecipientBalance))
       } else {
         invalidNel(
           s"Transaction application leads to negative balance of sender(${ftt.sender}):" +
-            s" before: $senderBalance, diff: $totalTransfer. result: $newSenderBalance")
+            s" before: $senderBalance, diff: $totalWithdraw. result: $newSenderBalance")
       }
 
 }
