@@ -10,7 +10,7 @@ import ex.model.state.Storage
 import ex.model.state.Storage.DSL
 import ex.model.transaction.FromToTransaction
 
-object NegativeBalanceValidation {
+object TemporaryNegativeBalanceValidation {
 
   type StateOverrides = Map[Address, Portfolio]
 
