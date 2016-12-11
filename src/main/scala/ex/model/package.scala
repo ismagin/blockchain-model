@@ -11,10 +11,9 @@ package object model {
 
   type Error                           = String
   type ErrorAccumulator                = NonEmptyList[Error]
-  type AccValidationResult[+A]         = Validated[ErrorAccumulator, A]
-  type FailFastValidationResult[+A]    = Either[Error, A]
-  type FreeFailFastValidationResult[A] = Free[DSL, FailFastValidationResult[A]]
+  type ValidationResult[+A]         = Validated[ErrorAccumulator, A]
+  type FreeValidationResult[A] = Free[DSL, ValidationResult[A]]
 
-  def validate(validIf: => Boolean, errorMessage: => String): AccValidationResult[Unit] = if (validIf) valid(()) else invalidNel(errorMessage)
+  def validate(validIf: => Boolean, errorMessage: => String): ValidationResult[Unit] = if (validIf) valid(()) else invalidNel(errorMessage)
 
 }

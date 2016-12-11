@@ -2,7 +2,7 @@ package ex.model.transaction
 
 import cats.data.NonEmptyList
 import cats.data.Validated.{Invalid, Valid}
-import ex.model.{Address, AccValidationResult}
+import ex.model.{Address, ValidationResult}
 import ex.model.Currency.WavesVolume
 import ex.testdata.ValidationSuccess
 import org.scalatest.FunSuite

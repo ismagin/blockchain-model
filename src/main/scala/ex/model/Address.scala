@@ -22,7 +22,7 @@ object Address {
   val ChecksumLength = 4
   val PkLength       = 20
 
-  def apply(bytes: Array[Byte]): AccValidationResult[Address] = {
+  def apply(bytes: Array[Byte]): ValidationResult[Address] = {
     if (bytes.length != 26) {
       invalidNel(s"Invalid length: expected: 26 actual: ${bytes.length}")
     } else {
