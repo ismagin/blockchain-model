@@ -2,18 +2,18 @@ package ex.model.validation
 
 import cats.data.Validated._
 import ex.model._
-import ex.model.state.Storage._
+import ex.model.state.Storage
 import ex.model.transaction.PaymentTransaction
 
 object PreviousPaymentTransactionValidation {
   def apply(startTime: Timestamp)(t: PaymentTransaction): FreeValidationResult[PaymentTransaction] =
     for {
-      time <- lastConfirmedBlockTimestamp()
+      time <- Storage.lastConfirmedBlockTimestamp()
       r <- if (time >= startTime)
-        pure(valid(t))
+        Storage.pure(valid(t))
       else {
         for {
-          maybeLastTx <- previousPaymentTransactionTimestamp(t.sender)
+          maybeLastTx <- Storage.previousPaymentTransactionTimestamp(t.sender)
         } yield
           maybeLastTx match {
             case Some(lastTx) if lastTx >= t.timestamp =>
