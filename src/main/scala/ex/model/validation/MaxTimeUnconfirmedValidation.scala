@@ -10,7 +10,7 @@ object MaxTimeUnconfirmedValidation {
 
   private val MaxTimeForUnconfirmed = 90.minutes.millis
 
-  def apply(ruleStartTime: Timestamp)(t: Transaction): FreeValidationResult[Transaction] =
+  def apply[T <: Transaction](ruleStartTime: Timestamp)(t: T): FreeValidationResult[T] =
     for {
       time <- Storage.lastConfirmedBlockTimestamp()
       r <- if (time > ruleStartTime && t.timestamp - time > MaxTimeForUnconfirmed)
