@@ -6,7 +6,7 @@ object Currency {
   case class WavesVolume(amount: Long)               extends Volume
   case class AssetVolume(asset: Asset, amount: Long) extends Volume
 
-  type AssetId   = Array[Byte]
+  type AssetId = Array[Byte]
 
   sealed trait Money
   case object Waves              extends Money
@@ -18,4 +18,7 @@ object Currency {
     case WavesVolume(amt)        => Map(Waves -> amt)
     case AssetVolume(asset, amt) => Map(asset -> amt)
   }
+
+  def isPositive(p: Portfolio): Boolean = p.values.forall(_ >= 0)
+  def negate(p: Portfolio): Portfolio   = p.map { case (k, v) => (k, -v) }
 }

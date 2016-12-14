@@ -1,24 +1,26 @@
 package ex.model.validation
 
-import cats.data.Validated._
+import cats._
+import cats.implicits._
+import cats.Monad
 import ex.model._
 import ex.model.state.Storage
-import ex.model.transaction.PaymentTransaction
+import ex.model.transaction.{PaymentTransaction, Transaction}
 
 object PreviousPaymentTransactionValidation {
-  def apply(startTime: Timestamp)(t: PaymentTransaction): FreeValidationResult[PaymentTransaction] =
+  def apply[F[_]: Storage: Monad, T <: Transaction](startTime: Timestamp)(t: PaymentTransaction): F[Xor[PaymentTransaction]] =
     for {
       time <- Storage.lastConfirmedBlockTimestamp()
       r <- if (time >= startTime)
-        Storage.pure(valid(t))
+        Monad[F].pure(Right(t))
       else {
         for {
           maybeLastTx <- Storage.previousPaymentTransactionTimestamp(t.sender)
         } yield
           maybeLastTx match {
             case Some(lastTx) if lastTx >= t.timestamp =>
-              invalidNel("Transaction timestamp is in the past")
-            case _ => valid(t)
+              Left("Transaction timestamp is in the past")
+            case _ => Right(t)
           }
 
       }

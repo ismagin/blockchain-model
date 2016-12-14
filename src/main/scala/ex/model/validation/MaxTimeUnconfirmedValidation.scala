@@ -1,20 +1,21 @@
 package ex.model.validation
 
-import cats.data.Validated._
+import cats._
+import cats.implicits._
+import cats.Monad
 import com.github.nscala_time.time.Imports._
+import ex.model._
 import ex.model.state.Storage
 import ex.model.transaction.Transaction
-import ex.model.{FreeValidationResult, _}
 
 object MaxTimeUnconfirmedValidation {
 
   private val MaxTimeForUnconfirmed = 90.minutes.millis
-
-  def apply[T <: Transaction](ruleStartTime: Timestamp)(t: T): FreeValidationResult[T] =
+  def apply[F[_]: Storage: Monad, T <: Transaction](ruleStartTime: Timestamp)(t: T): F[Xor[T]] =
     for {
       time <- Storage.lastConfirmedBlockTimestamp()
-      r <- if (time > ruleStartTime && t.timestamp - time > MaxTimeForUnconfirmed)
-        invalidNel("Transaction creation time more then block's creation time no more then on MaxTimeForUnconfirmed")
-      else valid(t)
-    } yield r
+    } yield
+      if (time > ruleStartTime && t.timestamp - time > MaxTimeForUnconfirmed)
+        Left("Transaction creation time more then block's creation time no more then on MaxTimeForUnconfirmed")
+      else Right(t)
 }
