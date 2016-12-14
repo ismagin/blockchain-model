@@ -19,5 +19,12 @@ object Storage {
   def lastConfirmedBlockTimestamp[F[_]]()(implicit F: Storage[F]): F[Timestamp]                           = F.lastConfirmedBlockTimestamp()
   def previousPaymentTransactionTimestamp[F[_]](a: Address)(implicit F: Storage[F]): F[Option[Timestamp]] = F.previousPaymentTransactionTimestamp(a)
   def accBalance[F[_]](a: Address)(implicit F: Storage[F]): F[Portfolio]                                  = F.accBalance(a)
+}
 
+trait Logging[F[_]] {
+  def log(str: String): F[Unit]
+}
+
+object Logging {
+  def log[F[_]](str: String)(implicit F: Logging[F]) = F.log(str)
 }
